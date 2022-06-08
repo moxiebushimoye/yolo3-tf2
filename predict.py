@@ -53,7 +53,7 @@ if __name__ == "__main__":
     #   test_interval和fps_image_path仅在mode='fps'有效
     #----------------------------------------------------------------------------------------------------------#
     test_interval   = 100
-    fps_image_path  = "img/street.jpg"
+    fps_image_path  = "img/test1.jpg"
     #-------------------------------------------------------------------------#
     #   dir_origin_path     指定了用于检测的图片的文件夹路径
     #   dir_save_path       指定了检测完图片的保存路径
@@ -80,6 +80,9 @@ if __name__ == "__main__":
         '''
         while True:
             img = input('Input image filename:')
+            ## 增加退出入口 ##
+            if img == "exit":
+                break
             try:
                 image = Image.open(img)
             except:
@@ -88,6 +91,7 @@ if __name__ == "__main__":
             else:
                 r_image = yolo.detect_image(image, crop = crop, count=count)
                 r_image.show()
+
 
     elif mode == "video":
         capture = cv2.VideoCapture(video_path)
