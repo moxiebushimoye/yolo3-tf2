@@ -1,5 +1,6 @@
 import colorsys
 import os
+import shutil
 import time
 
 import cv2
@@ -330,11 +331,12 @@ class YOLO(object):
         return
 
 
-    def get_xml(self,img_path,image,xmlsave_path):
+    def get_xml(self,img_path,image,xmlsave_path,noxml_image):
         '''
         img_path:图像文件路径
         image:PIL读取的图片对象
         xmlsave_path：生成的xml文件存储的文件夹名
+        noxml_image:未生成xml的图像数据存储文件夹
         运行生成图像标注文件
         '''
         img_name = img_path.split("/")[-1]

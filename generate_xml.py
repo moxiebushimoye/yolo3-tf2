@@ -1,4 +1,6 @@
 import os
+import shutil
+
 from PIL import Image
 
 from utils.create_xml import VOC_Sample_Generator
@@ -6,22 +8,31 @@ from yolo import YOLO
 import cv2
 import numpy as np
 from utils.utils import (cvtColor, preprocess_input,resize_image)
+import tensorflow as tf
 
-def get_xml(img_path, image, xmlsave_path):
+###初始化yolo模型 - 全局变量###
+yolo=YOLO()
+#############################
+
+
+def get_xml(img_path, image, xmlsave_path,move_path):
     '''
     img_path:图像文件路径
     image:PIL读取的图片对象
     xmlsave_path：生成的xml文件存储的文件夹名
     运行生成图像标注文件
     '''
-    yolo=YOLO() # 初始化yolo模型
     img_name = img_path.split("/")[-1]
     xml_name = img_name.split('.')[0]
-    img = cv2.imread(img_path)
-    img_width = img.shape[0]
-    img_height = img.shape[1]
-    img_depth = img.shape[-1]
+    try:
+        img = cv2.imread(img_path)
+        img_width = img.shape[0]
+        img_height = img.shape[1]
+        img_depth = img.shape[-1]
+    except Exception:
+        print(img_path)
     image = cvtColor(image)
+
     # ---------------------------------------------------------#
     #   给图像增加灰条，实现不失真的resize        #   也可以直接resize进行识别
     # ---------------------------------------------------------#
@@ -45,8 +56,9 @@ def get_xml(img_path, image, xmlsave_path):
     input_image_shape = np.expand_dims(np.array([image.size[1], image.size[0]], dtype='float32'), 0)
     out_boxes, out_scores, out_classes = yolo.get_pred(image_data, input_image_shape)
 
-    if out_classes.size != 0:
-        voc = VOC_Sample_Generator()
+    # print(out_classes.numpy().size)
+    voc = VOC_Sample_Generator()
+    if out_classes.numpy().size != 0:
         voc.add_filename(img_name)
         voc.add_size(img_width, img_height, img_depth)
         for i, c in list(enumerate(out_classes)):
@@ -59,25 +71,30 @@ def get_xml(img_path, image, xmlsave_path):
             right = min(image.size[0], np.floor(right).astype('int32'))
             voc.build_object(predicted_class, left, top, right, bottom)
         voc.build(xmlsave_path + xml_name + ".xml")
+    else:
+        shutil.move(img_path,move_path)
 
 
-def xml_main(target_dir,xml_path):
+
+
+def xml_main(target_dir,xml_path,move_dir):
     if not os.path.exists(xml_path):
         os.makedirs(xml_path)
     # img_path = "appleimg/apple1.jpg"
+    if not os.path.exists(move_dir):
+        os.makedirs(move_dir)
     imgpath_list=os.listdir(target_dir)
     for img_name in imgpath_list:
-            image_path = os.path.join(target_dir, img_name)
-            image = Image.open(image_path)
-            # crop = False
-            # count = False
-            # 调用模型预测
-            get_xml(image_path, image, xml_path)
+        image_path = os.path.join(target_dir, img_name)
+        image = Image.open(image_path)
+        move_path=os.path.join(move_dir,img_name)
+        get_xml(image_path, image,xml_path, move_path)
 
 
 if __name__ == '__main__':
     # 存储待标注图像的文件夹路径
-    target_dir = "imagedir/"
+    target_dir = "auto_label/images/"
     # 生成标志文件的存储路径
-    xml_path = "xml_anno/"
-    xml_main(target_dir,xml_path)
+    xml_path = "auto_label/xml_anno/"
+    move_dir="auto_label/noxml_img/"
+    xml_main(target_dir,xml_path,move_dir)

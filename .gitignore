@@ -2,14 +2,17 @@
 map_out/
 miou_out/
 VOCdevkit/
+auto_label/
 datasets/
 Medical_Datasets/
 lfw/
 logs/
+report/
 model_data/
 .temp_map_out/
-imagedir/
+auto_label/imagedir/
 img/
+.idea/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -17,7 +20,7 @@ __pycache__/
 
 # C extensions
 *.so
-
+case.py
 # Distribution / packaging
 .Python
 build/
@@ -44,7 +47,8 @@ MANIFEST
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
-
+2007_train.txt
+2007_val.txt
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt

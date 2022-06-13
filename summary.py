@@ -3,6 +3,7 @@
 #--------------------------------------------#
 from nets.yolo import yolo_body
 from utils.utils import net_flops
+from tensorflow.keras.utils import plot_model
 
 if __name__ == "__main__":
     input_shape     = [416, 416]
@@ -13,14 +14,15 @@ if __name__ == "__main__":
     #--------------------------------------------#
     #   查看网络结构网络结构
     #--------------------------------------------#
-    model.summary()
+    # model.summary()
     #--------------------------------------------#
     #   计算网络的FLOPS
     #--------------------------------------------#
-    net_flops(model, table=False)
+    # net_flops(model, table=False)
     
     #--------------------------------------------#
     #   获得网络每个层的名称与序号
     #--------------------------------------------#
     # for i,layer in enumerate(model.layers):
     #     print(i,layer.name)
+    plot_model(model,to_file='report/model.png')
